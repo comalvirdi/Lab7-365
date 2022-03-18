@@ -156,13 +156,11 @@ public class InnReservations {
                             ps.setString(1, firstname);
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
-                            conn.commit();
                             System.out.println("Successfully updated first name.");
                         }
                         catch(SQLException e) {
                             System.out.println("Error updating first name");
                             e.printStackTrace();
-                            conn.rollback();
                         }
                     }
                     if(!lastname.equalsIgnoreCase("no change")) {
@@ -171,13 +169,11 @@ public class InnReservations {
                             ps.setString(1, lastname);
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
-                            conn.commit();
                             System.out.println("Successfully updated Last name.");
                         }
                         catch(SQLException e) {
                             System.out.println("Error updating Last name.");
                             e.printStackTrace();
-                            conn.rollback();
                         }
                     }
                     if(!checkin.equalsIgnoreCase("no change")) {
@@ -188,13 +184,11 @@ public class InnReservations {
                             ps.setDate(1, java.sql.Date.valueOf(checkin));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
-                            //conn.commit();
                             System.out.println("Successfully updated Check In Date");
                         }
                         catch (SQLException e) {
                             System.out.println("Error updating check in date");
                             e.printStackTrace();
-                            //conn.rollback();
                         }
                     }
                     if(!checkout.equalsIgnoreCase("no change")) {
@@ -204,13 +198,11 @@ public class InnReservations {
                             ps.setDate(1, java.sql.Date.valueOf(checkout));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
-                            conn.commit();
                             System.out.println("Successfully updated Check Out Date");
                         }
                         catch (SQLException e) {
                             System.out.println("Error updating check out date");
                             e.printStackTrace();
-                            conn.rollback();
                         }
                     }
                     if(!adults.equalsIgnoreCase("no change")) {
@@ -219,13 +211,11 @@ public class InnReservations {
                             ps.setInt(1, Integer.parseInt(adults));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
-                            conn.commit();
                             System.out.println("Successfully updated number of adults.");
                         }
                         catch(SQLException e) {
                             System.out.println("Error updating number of adults");
                             e.printStackTrace();
-                            conn.rollback();
                         }
                     }
                     if(!children.equalsIgnoreCase("no change")) {
@@ -234,13 +224,11 @@ public class InnReservations {
                             ps.setInt(1, Integer.parseInt(children));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
-                            conn.commit();
                             System.out.println("Successfully updated number of children.");
                         }
                         catch(SQLException e) {
                             System.out.println("Error updating number of children");
                             e.printStackTrace();
-                            conn.rollback();
                         }
                     }
                 }
