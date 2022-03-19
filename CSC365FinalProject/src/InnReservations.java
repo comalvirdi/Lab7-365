@@ -9,6 +9,7 @@ import java.lang.System;
 
 import java.util.Scanner;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 public class InnReservations {
     public static void main(String[] args) {
@@ -38,7 +39,7 @@ public class InnReservations {
                         break;
                     case 2:
                         System.out.println("Make a Reservation...");
-                        ir.demo1();
+                        ir.fr2(reader);
                         break;
                     case 3:
                         System.out.println("Change Reservation...");
@@ -399,6 +400,94 @@ public class InnReservations {
     }
 
 
+    private void fr2(Scanner reader) throws SQLException {
+        String FN = "";
+        String LN = "";
+        String roomCode = "";
+        String BedType = "";
+        String begin = "";
+        String end = "";
+        String children = "";
+        String adults = "";
+
+        String RC = "";
+        String RN = "";
+
+        List<LocalDate> dates;
+        try {
+
+                // Step 4: Send SQL statement to DBMS
+                    //switch to preparedstatement?
+                    //Map<String, String> reservationChange = new HashMap<>()
+
+                    System.out.println("Welcome to the Reservation booking system");
+                    System.out.println("Enter your First Name");
+                    FN = reader.nextLine();
+
+                    System.out.println("Enter your Last Name");
+                    LN = reader.nextLine();
+
+                    System.out.println("Enter a preferred Room Code");
+                    roomCode = reader.nextLine();
+
+                    System.out.println("Enter a preferred Bed Type");
+                    BedType = reader.nextLine();
+
+                    System.out.println("Enter your requested checkin date (YYYY-MM-DD)");
+                    begin = reader.nextLine();
+
+                    System.out.println("Enter your requested checkout date (YYYY-MM-DD)");
+                    end = reader.nextLine();
+
+                    System.out.println("Enter the number of adults staying");
+                    children = reader.nextLine();
+
+                    System.out.println("Enter the number of children staying ");
+                    adults = reader.nextLine();
+                    System.out.println("Thank you for your input! Looking for available bookings... \r\n");
+        } catch (Exception e) {
+        }
+
+        try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+                System.getenv("HP_JDBC_USER"),
+                System.getenv("HP_JDBC_PW"))) {
+
+            StringBuilder sb = new StringBuilder();
+
+            LocalDate checkin = LocalDate.parse(begin);
+            LocalDate checkout = LocalDate.parse(end);
+            dates = checkin.datesUntil(checkout).collect(Collectors.toList());
+            System.out.println(dates);
+            sb.append("select * from kpinnipa.lab7_rooms where kpinnipa.lab7_rooms.roomCode not in (select distinct roomcode from kpinnipa.lab7_rooms join kpinnipa.lab7_reservations on roomcode = room where "
+        + begin + " >= checkin and " + begin + " < checkout or " + end + " >= checkin and " + end+ "< checkout");
+
+            for (LocalDate date: dates){
+                sb.append(" or " + date.toString() + " >= checkin and " + date.toString() + " < checkout");
+            }
+
+            sb.append("  order by RoomCode)");
+
+
+            try (Statement stmt = conn.createStatement()) {
+                ResultSet rs = stmt.executeQuery(sb.toString());
+                if(!rs.next()) {
+                    // if code not in system
+                    System.out.println("Invalid dates");
+                }
+                else {
+                    while(rs.next()) {
+                        RC = rs.getString("RoomCode");
+                        RN = rs.getString("RoomName");
+                        System.out.println(RC + " " + RN);
+
+                }
+
+            }
+            }
+        }
+
+
+    }
 }
 
 
