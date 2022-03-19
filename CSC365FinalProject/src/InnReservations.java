@@ -16,7 +16,7 @@ public class InnReservations {
             Scanner reader = new Scanner(System.in);
             InnReservations ir = new InnReservations();
             System.out.println("Hello! We are the Inn Managers. Please refer to the following options:");
-            int optionNum = Integer.parseInt(args[0]);
+            int optionNum = 1;
             while(optionNum != -1) {
                 System.out.println("\n");
                 System.out.println("1: Rooms and Rates");
@@ -46,7 +46,7 @@ public class InnReservations {
                         break;
                     case 4:
                         System.out.println("Proceeding to Cancel Reservation...");
-                        ir.demo1();
+                        ir.fr4(reader);
                         break;
                     case 5:
                         System.out.println("Proceeding to Inn Revenue...");
@@ -111,7 +111,7 @@ public class InnReservations {
                 System.getenv("HP_JDBC_PW"))) {
             // Step 2: Construct SQL statement
             StringBuilder sb = new StringBuilder();
-            sb.append("select CODE from snrietke.lab7_reservations WHERE CODE =");
+            sb.append("select CODE from lab7_reservations WHERE CODE =");
             sb.append(resCode);
             sb.append(";");
 
@@ -152,7 +152,7 @@ public class InnReservations {
 
                     if(!firstname.equalsIgnoreCase("no change")) {
                         //sb2 += (", FirstName = '" + firstname + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set firstname=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set firstname=? where code=?;")) {
                             ps.setString(1, firstname);
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -165,7 +165,7 @@ public class InnReservations {
                     }
                     if(!lastname.equalsIgnoreCase("no change")) {
                         //sb2 += (", LastName = '" + lastname + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set lastname=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set lastname=? where code=?;")) {
                             ps.setString(1, lastname);
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -180,7 +180,7 @@ public class InnReservations {
                         // need to query and see if this room is available on that check in date (trigger?)
                         //sb2 += (", CheckIn = '" + checkin + "'");
 
-                        try (PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set CheckIn=? where code = ?;")) {
+                        try (PreparedStatement ps = conn.prepareStatement("update lab7_reservations set CheckIn=? where code = ?;")) {
                             ps.setDate(1, java.sql.Date.valueOf(checkin));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -194,7 +194,7 @@ public class InnReservations {
                     if(!checkout.equalsIgnoreCase("no change")) {
                         // need to query and see if this room is available on that new check out date
                         //sb2 += (", CheckOut = '" + checkout + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set Checkout=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set Checkout=? where code=?;")) {
                             ps.setDate(1, java.sql.Date.valueOf(checkout));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -207,7 +207,7 @@ public class InnReservations {
                     }
                     if(!adults.equalsIgnoreCase("no change")) {
                         //sb2 += (", Adults = '" + adults + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set Adults=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set Adults=? where code=?;")) {
                             ps.setInt(1, Integer.parseInt(adults));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -220,7 +220,7 @@ public class InnReservations {
                     }
                     if(!children.equalsIgnoreCase("no change")) {
                         //sb2 += (", Kids = '" + children + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set Kids=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set Kids=? where code=?;")) {
                             ps.setInt(1, Integer.parseInt(children));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -244,5 +244,58 @@ public class InnReservations {
             e.printStackTrace();
         }
         // Step 7: Close connection (handled by try-with-resources syntax)
+    }
+
+    private void fr4(Scanner reader) throws SQLException {
+
+        System.out.println("Please enter your reservation code: ");
+        int resCode = reader.nextInt();
+        reader.nextLine(); //throw away \n
+        // Step 1: Establish connection to RDBMS
+        try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+                System.getenv("HP_JDBC_USER"),
+                System.getenv("HP_JDBC_PW"))) {
+            // Step 2: Construct SQL statement
+            StringBuilder sb = new StringBuilder();
+            sb.append("select CODE from lab7_reservations WHERE CODE =");
+            sb.append(resCode);
+            sb.append(";");
+
+            try (Statement stmt = conn.createStatement()) {
+                ResultSet rs = stmt.executeQuery(sb.toString());
+                if(!rs.next()) {
+                    // if code not in system
+                    System.out.println("Invalid reservation code:\r\n" + resCode);
+                }
+                else {
+                    System.out.println("Are you sure you want to cancel your reservation with code: " + resCode + "? (Y/N)");
+                    String ans = reader.nextLine();
+                    if(ans.equalsIgnoreCase("Y")) {
+                        try(PreparedStatement ps = conn.prepareStatement("DELETE FROM lab7_reservations WHERE Code = ?")) {
+                            ps.setInt(1, resCode);
+                            int query = ps.executeUpdate();
+                            if(query >= 1) {
+                                System.out.println("Reservation cancelled!");
+                            }
+                            else {
+                                System.out.println("Problem with reservation cancellation. Please try again.");
+                            }
+                        }
+                        catch(SQLException e) {
+                            System.out.println("Error cancelling reservation");
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        System.out.println("No changes made!");
+                    }
+                }
+            } catch(SQLException e) {
+                e.printStackTrace();
+            }
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
