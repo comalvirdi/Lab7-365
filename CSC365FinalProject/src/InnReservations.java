@@ -50,9 +50,9 @@ public class InnReservations {
                         break;
                     case 5:
                         System.out.println("Proceeding to Inn Revenue...");
-                        ir.demo1();
+                        ir.fr6(reader);
                         break;
-                    case 6:
+                    case 7:
                         System.out.println("Thank you for using our service. Good bye!");
                         optionNum = -1;
                         System.exit(0);
@@ -94,6 +94,7 @@ public class InnReservations {
         }
         // Step 7: Close connection (handled by try-with-resources syntax)
     }
+
 
     private void fr1(Scanner reader) throws SQLException {
         String room;
@@ -143,6 +144,93 @@ public class InnReservations {
                         decor = rs.getString("decor");
 
                         System.out.format("\n %-17s  %-10s  %-25s  %-10s  %-15s  %-15s  %-15s  %-15s  %-25s  %-25s\n", popularityScore, room, roomName, beds, bedType, maxOcc, basePrice, decor, nextAvailableCheckinDate, lengthLastStay);
+                    }
+
+                }
+            }
+            catch(SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void fr6(Scanner reader) throws SQLException {
+        String Room;
+        String Jan;
+        String Feb;
+        String March;
+        String April;
+        String May;
+        String June;
+        String July;
+        String August;
+        String Septmeber;
+        String October;
+        String November;
+        String December;
+        String RoomAnnualTotal;
+
+        try(Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
+                System.getenv("HP_JDBC_USER"),
+                System.getenv("HP_JDBC_PW")))  {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(    "with Years as (select Room, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 1 then DATEDIFF(checkout, checkin) * rate else 0 end),0) as Jan, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 2 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Feb, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 3 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Mar, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 4 then DATEDIFF(checkout, checkin) * rate else 0 end),0) as Apr, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 5 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as May, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 6 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Jun, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 7 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Jul, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 8 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Aug, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 9 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Sep, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 10 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Oct, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 11 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Nov, "+
+                    "    round(sum(CASE when MONTH(CheckOut) = 12 then DATEDIFF(checkout, checkin) * rate  else 0 end),0) as Dece "+
+                    "from kpinnipa.lab7_reservations join kpinnipa.lab7_rooms on Room = RoomCode group by Room), "+
+                    " RoomTotals as (select Room, sum(Jan + Feb + Mar + Apr + May + Jun + Jul + Aug + Sep + Oct + Nov + Dece) RoomAnnualTotal from Years group by ROom), "+
+                    "monthTotals as (select \"Total\", sum(jan) janTotals, sum(feb) febTotals, sum(Mar) marTotals, sum(Apr) aprTotals, sum(May) mayTotals, sum(Jun) junTotals, sum(Jul) julTotals, sum(Aug) augTotals, sum(sep) sepTotals, sum(oct) octTotals, sum(nov) novTotals, sum(dece) decTotals, (sum(jan) + sum(feb) +sum(Mar) + sum(Apr) + sum(May) + sum(Jun)+ sum(Jul)+ sum(Aug)+ sum(sep)+ sum(oct)+ sum(nov)+ sum(dece)) allRev from Years where Room in (select room from Years)), " +
+                    "appd as (select * from Years join RoomTotals using (room)) "+
+                    "select * from appd union all select * from monthTotals");
+
+            System.out.println("Rooms Revenue Information: ");
+
+            System.out.format("\n %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s\n", "Room", "Jan", "Feb", "March", "April", "May", "June", "July", "August", "Septmeber", "November", "October", "December", "RoomAnnualTotal");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+
+            try (Statement stmt = conn.createStatement()) {
+                ResultSet rs = stmt.executeQuery(sb.toString());
+                if(!rs.next()) {
+                    // if code not in system
+                    System.out.println("Sorry Invalid Query" );
+                }
+                else {
+                    while (rs.next()) {
+                        Room = rs.getString("Room");
+                        Jan = rs.getString("Jan");
+                        Feb= rs.getString("Feb");
+                        March = rs.getString("Mar");
+                        April = rs.getString("Apr");
+                        May = rs.getString("May");
+                        June = rs.getString("Jun");
+                        July = rs.getString("Jul");
+                        August = rs.getString("Aug");
+                        Septmeber = rs.getString("Sep");
+                        October = rs.getString("Oct");
+                        November = rs.getString("Nov");
+                        December = rs.getString("Dece");
+                        RoomAnnualTotal = rs.getString("RoomAnnualTotal");
+
+
+                        System.out.format("\n %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s  %-15s\n", Room, Jan, Feb, March, April, May, June, July, August, Septmeber, November, October, December, RoomAnnualTotal);
                     }
 
                 }
