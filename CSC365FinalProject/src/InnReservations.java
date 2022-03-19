@@ -264,7 +264,7 @@ public class InnReservations {
                 System.getenv("HP_JDBC_PW"))) {
             // Step 2: Construct SQL statement
             StringBuilder sb = new StringBuilder();
-            sb.append("select CODE from snrietke.lab7_reservations WHERE CODE =");
+            sb.append("select CODE from lab7_reservations WHERE CODE =");
             sb.append(resCode);
             sb.append(";");
 
@@ -305,7 +305,7 @@ public class InnReservations {
 
                     if(!firstname.equalsIgnoreCase("no change")) {
                         //sb2 += (", FirstName = '" + firstname + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set firstname=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set firstname=? where code=?;")) {
                             ps.setString(1, firstname);
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -318,7 +318,7 @@ public class InnReservations {
                     }
                     if(!lastname.equalsIgnoreCase("no change")) {
                         //sb2 += (", LastName = '" + lastname + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set lastname=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set lastname=? where code=?;")) {
                             ps.setString(1, lastname);
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -333,7 +333,7 @@ public class InnReservations {
                         // need to query and see if this room is available on that check in date (trigger?)
                         //sb2 += (", CheckIn = '" + checkin + "'");
 
-                        try (PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set CheckIn=? where code = ?;")) {
+                        try (PreparedStatement ps = conn.prepareStatement("update lab7_reservations set CheckIn=? where code = ?;")) {
                             ps.setDate(1, java.sql.Date.valueOf(checkin));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -347,7 +347,7 @@ public class InnReservations {
                     if(!checkout.equalsIgnoreCase("no change")) {
                         // need to query and see if this room is available on that new check out date
                         //sb2 += (", CheckOut = '" + checkout + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set Checkout=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set Checkout=? where code=?;")) {
                             ps.setDate(1, java.sql.Date.valueOf(checkout));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -360,7 +360,7 @@ public class InnReservations {
                     }
                     if(!adults.equalsIgnoreCase("no change")) {
                         //sb2 += (", Adults = '" + adults + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set Adults=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set Adults=? where code=?;")) {
                             ps.setInt(1, Integer.parseInt(adults));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
@@ -373,7 +373,7 @@ public class InnReservations {
                     }
                     if(!children.equalsIgnoreCase("no change")) {
                         //sb2 += (", Kids = '" + children + "'");
-                        try(PreparedStatement ps = conn.prepareStatement("update snrietke.lab7_reservations set Kids=? where code=?;")) {
+                        try(PreparedStatement ps = conn.prepareStatement("update lab7_reservations set Kids=? where code=?;")) {
                             ps.setInt(1, Integer.parseInt(children));
                             ps.setInt(2, resCode);
                             ps.executeUpdate();
